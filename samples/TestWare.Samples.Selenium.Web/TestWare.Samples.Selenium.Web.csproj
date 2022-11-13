@@ -69,9 +69,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Features\Haled\Consumer\" />
+	  <Folder Include="Features\Haled\Consumer\Home\" />
+	  <Folder Include="Features\Haled\Laboratory\" />
 	  <Folder Include="Features\Stinto\" />
-	  <Folder Include="StepDefinitions\Haled\Consumer\Login\" />
+	  <Folder Include="POM\Haled\Laboratory\" />
+	  <Folder Include="StepDefinitions\Haled\Laboratory\" />
 	</ItemGroup>
 
 </Project>

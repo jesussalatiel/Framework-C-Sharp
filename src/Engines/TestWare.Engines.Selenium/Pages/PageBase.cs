@@ -1,6 +1,8 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
+using System.Threading;
+using TechTalk.SpecFlow;
 using TestWare.Core.Libraries;
 using TestWare.Engines.Selenium.Extras;
 
@@ -102,12 +104,15 @@ public abstract class PageBase
     }
 
     protected void WaitUntilElementIsVisible(By locator)
-        => this.WaitUntilElementIsVisible(locator, TimeToWait);
+    {
+        this.WaitUntilElementIsVisible(locator, TimeToWait);
+    }
+
 
     protected void WaitUntilElementIsVisible(By locator, int timeToWait)
     {
-        var webDriverWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(timeToWait));
-        webDriverWait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(locator));
+
+        WaitToLoadPage(timeToWait).Until(ExpectedConditions.ElementIsVisible(locator));
     }
 
     protected void WaitUntilElementNotVisible(By locator, int secondsToWait)
@@ -122,4 +127,48 @@ public abstract class PageBase
         Thread.Sleep(secondsToDelayAction * 1000);
         action.Invoke();
     }
+
+    protected Actions Action()
+    {
+        return new Actions(Driver);
+    }
+
+    protected IList<IWebElement> GetElementOfList(IWebElement element)
+    {
+        return element.FindElements(By.TagName("li"));
+    }
+
+    protected DefaultWait<IWebDriver> WaitToLoadPage(int timeToWait)
+    {
+        /* DefaultWait Class used to control timeout and polling frequency */
+        DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(Driver);
+        /* Setting the timeout in seconds */
+        fluentWait.Timeout = TimeSpan.FromSeconds(timeToWait);
+        /* Configuring the polling frequency in ms */
+        fluentWait.PollingInterval= TimeSpan.FromSeconds(3);
+
+        fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+
+        fluentWait.Message = "Element to be searched not found";
+
+        return fluentWait;
+    }
+
+    protected void WaitToElementLoad(By locator)
+    {
+        var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
+        var element = Driver.FindElement(locator);
+        wait.Until(ExpectedConditions.StalenessOf(element));
+    }
+
+    protected Dictionary<string, string> GetDataTable(Table table)
+    {
+        var dictionary = new Dictionary<string, string>();
+        foreach (var row in table.Rows)
+        {
+            dictionary.Add(row[0], row[1]);
+        }
+        return dictionary;
+    }
+
 }
