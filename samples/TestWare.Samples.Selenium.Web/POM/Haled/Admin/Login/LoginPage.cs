@@ -4,7 +4,7 @@ using TestWare.Engines.Selenium.Extras;
 using TestWare.Engines.Selenium.Factory;
 using TestWare.Engines.Selenium.Pages;
 
-namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin;
+namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Login;
 
 public class LoginPage : WebPage, ILoginPage
 {
@@ -22,6 +22,10 @@ public class LoginPage : WebPage, ILoginPage
     [FindsBy(How = How.XPath, Using = ".//a[contains(., 'Forgot')]")]
     public IWebElement ForgotPasswordButton { get; set; }
 
+    [FindsBy(How = How.XPath, Using = "//div[@id='sidebarNav']/ul")]
+    public IWebElement AdminGlobalBarList { get; set; }
+
+    private By locator;
 
     public LoginPage(IBrowserDriver driver) : base(driver)
     {
@@ -47,14 +51,32 @@ public class LoginPage : WebPage, ILoginPage
     {
         ClickElement(LoginButton);
     }
-    
+
     public void CheckUserIsAtLoginPage()
     {
         RetryPolicies.ExecuteActionWithRetries(
             () =>
             {
-                this.Driver.Url.Should().Be(LoginUrl);
+                Driver.Url.Should().Be(LoginUrl);
             });
+    }
+
+    public void GoTo(string section)
+    {
+        locator = By.TagName("li");
+        WaitUntilElementIsVisible(locator);
+        IList<IWebElement> elements = AdminGlobalBarList.FindElements(locator);
+        bool isAtPage = false;
+        foreach (var element in elements)
+        {
+            if (element.Text.StartsWith(section))
+            {
+                element.Click();
+                isAtPage = true;
+                break;
+            }
+        }
+        Assert.IsTrue(isAtPage);
     }
 }
 

@@ -23,6 +23,7 @@
 	  <SpecFlowObsoleteCodeBehindFiles Remove="Features\Haled\Admin\Login\Login.feature.cs" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Faker.Net" Version="2.0.154" />
 		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.OpenApi.Configuration.AppSettings" Version="1.4.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.4.0" />
 		<PackageReference Include="MSTest.TestAdapter" Version="2.2.10" />
@@ -31,6 +32,7 @@
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="RestSharp" Version="108.0.2" />
 		<PackageReference Include="SpecFlow.Plus.LivingDocPlugin" Version="3.9.57" />
 		<PackageReference Include="SpecFlow.MsTest" Version="3.9.74" />
 		<PackageReference Include="FluentAssertions" Version="6.8.0" />

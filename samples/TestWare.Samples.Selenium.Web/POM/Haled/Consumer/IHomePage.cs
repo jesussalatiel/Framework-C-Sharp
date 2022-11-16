@@ -15,7 +15,7 @@ public interface IHomePage : ITestWareComponent
 
     void IsTitleDisplayed(string title, string option = "title");
 
-    void IsPriceDisplayed(string price);
+    void IsPriceDisplayed(string price, bool expectedResult = true);
 
     void ClickOnAddToCart();
 
@@ -26,5 +26,13 @@ public interface IHomePage : ITestWareComponent
     void ItemsInCart(string quantity);
 
     void FillBillingDetails(Table table);
+
+    void AcceptTermsAndConditions();
+
+    void AcceptTestingConsent();
+
+    void PlaceOrder();
+
+    void IsOrderNumberDisplayed();
 }
 

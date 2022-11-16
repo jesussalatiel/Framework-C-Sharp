@@ -1,4 +1,5 @@
-﻿using OpenQA.Selenium;
+﻿using AngleSharp.Dom;
+using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.UI;
 using System.Threading;
@@ -20,7 +21,7 @@ public abstract class PageBase
     protected void ClickElement(IWebElement element)
     {
         element = element ?? throw new ArgumentNullException(nameof(element), "Element to be clicked was null");
-
+        WaitToLoadPage();
         RetryPolicies.ExecuteActionWithRetries(
             () =>
             {
@@ -103,23 +104,27 @@ public abstract class PageBase
         webDriverWait.Until(ExpectedConditions.ElementToBeClickable(element));
     }
 
-    protected void WaitUntilElementIsVisible(By locator)
-    {
-        this.WaitUntilElementIsVisible(locator, TimeToWait);
-    }
-
-
-    protected void WaitUntilElementIsVisible(By locator, int timeToWait)
-    {
-
-        WaitToLoadPage(timeToWait).Until(ExpectedConditions.ElementIsVisible(locator));
-    }
-
     protected void WaitUntilElementNotVisible(By locator, int secondsToWait)
     {
         Thread.Sleep(1000);
         var webDriverWait = new WebDriverWait(Driver, TimeSpan.FromSeconds(secondsToWait));
         webDriverWait.Until(ExpectedConditions.InvisibilityOfElementLocated(locator));
+    }
+
+    protected void WaitUntilElementIsVisible(By locator)
+    {
+        /* DefaultWait Class used to control timeout and polling frequency */
+        DefaultWait<IWebDriver> fluentWait = new DefaultWait<IWebDriver>(Driver);
+        /* Setting the timeout in seconds */
+        fluentWait.Timeout = TimeSpan.FromSeconds(TimeToWait);
+        /* Configuring the polling frequency in ms */
+        fluentWait.PollingInterval = TimeSpan.FromSeconds(3);
+
+        fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+
+        fluentWait.Message = "Element to be searched not found";
+
+        fluentWait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(locator));
     }
 
     protected static void ExecuteActionWithDelay(Action action, int secondsToDelayAction)
@@ -154,14 +159,17 @@ public abstract class PageBase
         return fluentWait;
     }
 
-    protected void WaitToElementLoad(By locator)
+    protected void WaitToElementLoad(IWebElement element)
     {
-        var wait = new WebDriverWait(Driver, TimeSpan.FromSeconds(30));
-        var element = Driver.FindElement(locator);
-        wait.Until(ExpectedConditions.StalenessOf(element));
+        WaitToLoadPage(TimeToWait).Until(x => element);
     }
 
-    protected Dictionary<string, string> GetDataTable(Table table)
+    protected void WaitToElementLoad(By locator)
+    {
+        WaitToLoadPage(TimeToWait).Until(x=> Driver.FindElement(locator));
+    }
+
+    protected Dictionary<string, string> TableToDictionary(Table table)
     {
         var dictionary = new Dictionary<string, string>();
         foreach (var row in table.Rows)
@@ -171,4 +179,9 @@ public abstract class PageBase
         return dictionary;
     }
 
+    protected void WaitToLoadPage()
+    {
+        new WebDriverWait(Driver, TimeSpan.FromSeconds(30)).Until(
+        d => ((IJavaScriptExecutor)d).ExecuteScript("return document.readyState").Equals("complete"));
+    }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TestWare.Core.Interfaces;
 
-namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin;
+namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Login;
 
 /// <summary>
 /// Encapsulate all Loging busines logic
@@ -38,4 +38,6 @@ public interface ILoginPage : ITestWareComponent
     /// Click in Forgot Password
     /// </summary>
     void ClickForgotPassword();
+
+    void GoTo(string section);
 }

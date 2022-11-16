@@ -45,13 +45,24 @@ public sealed class SelectTestKitSteps
     [When(@"the user clicks on place order")]
     public void WhenTheUserClicksOnPlaceOrder()
     {
-
+        homePage.PlaceOrder();
     }
 
     [Then(@"the user should see page title as ""(.*)""")]
     public void ThenTheUserShouldSeePageTitleAs(string title)
     {
         homePage.IsTitleDisplayed(title, "sub_title");
+    }
+
+    [Then(@"the user should confirm the ""(.*)"" displayed")]
+    public void ThenTheUserShouldConfirmTheDisplayed(string price)
+    {
+        homePage.IsPriceDisplayed(price);
+    }
+    [Given(@"the user should confirm the ""([^""]*)"" displayed")]
+    public void GivenTheUserShouldConfirmTheDisplayed(string price)
+    {
+        homePage.IsPriceDisplayed(price);
     }
 
     [Then(@"the user should see page subtitle as ""(.*)""")]
@@ -81,12 +92,18 @@ public sealed class SelectTestKitSteps
     [Then(@"the user clicks on terms and conditions checkbox")]
     public void ThenTheUserClicksOnTermsAndConditionsCheckbox()
     {
-
+        homePage.AcceptTermsAndConditions();
     }
 
     [Then(@"the user clicks on testing consent checkbox")]
     public void ThenTheUserClicksOnTestingConsentCheckbox()
     {
+        homePage.AcceptTestingConsent();
+    }
 
+    [Then(@"the user verifies the order number")]
+    public void ThenTheUserVerifiesTheOrderNumber()
+    {
+        homePage.IsOrderNumberDisplayed();
     }
 }

@@ -4,6 +4,7 @@ using OpenQA.Selenium.Interactions;
 using TestWare.Engines.Selenium.Extras;
 using TestWare.Engines.Selenium.Factory;
 using TestWare.Engines.Selenium.Pages;
+using static MongoDB.Driver.WriteConcern;
 
 namespace TestWare.Samples.Selenium.Web.POM.Haled.Consumer;
 
@@ -23,6 +24,18 @@ public class HomePage : WebPage, IHomePage
 
     [FindsBy(How = How.XPath, Using = "//a[contains(text(), 'Proceed to Checkout')]")]
     private IWebElement checkOutButton { get; set; }
+
+    [FindsBy(How = How.XPath, Using = "//a[contains(text(), 'Proceed to Checkout')]")]
+    private IWebElement termsButton { get; set; }
+
+    [FindsBy(How = How.Id, Using = "terms")]
+    private IWebElement checkOutTermsButton { get; set; }
+
+    [FindsBy(How = How.Id, Using = "checkout_checkbox_testing_consent")]
+    private IWebElement checkOutTestingConsentButton { get; set; }
+
+    [FindsBy(How = How.Id, Using = "place_order")]
+    private IWebElement placeOrderButton { get; set; }
 
     private By locator;
     private IWebElement element;
@@ -69,29 +82,42 @@ public class HomePage : WebPage, IHomePage
 
     public void IsTitleDisplayed(string title, string option = "title")
     {
-        Thread.Sleep(2000);
         if (option.Equals("title"))
         {
             locator = By.XPath(string.Format("//h1[contains(text(), '{0}')]", title));
+            WaitToElementLoad(locator);
             Assert.IsTrue(Driver.FindElement(locator).Displayed);
         }
         else if (option.Equals("sub_title"))
         {
             locator = By.XPath(string.Format("//h2[contains(text(), '{0}')]", title));
+            WaitUntilElementIsVisible(locator);
             Assert.IsTrue(Driver.FindElement(locator).Displayed);
         }
         else if (option.Equals("other"))
         {
             locator = By.XPath(string.Format("//*[contains(text(), '{0}')]", title));
+            WaitUntilElementIsVisible(locator);
             Assert.IsTrue(Driver.FindElement(locator).Displayed);
         }
     }
 
-    public void IsPriceDisplayed(string price)
+    public void IsPriceDisplayed(string price, bool expectedResult = true)
     {
         locator = By.XPath(string.Format("//bdi[contains(text(), '{0}')]", price));
-        WaitUntilElementIsVisible(locator);
-        Assert.IsTrue(Driver.FindElement(locator).Displayed);
+        WaitToLoadPage();
+        IList<IWebElement> elements =  Driver.FindElements(locator);
+        bool isPriceDisplayed = false;
+        foreach (var item in elements)
+        {
+            isPriceDisplayed = (item.Text.Contains(price)) ? true : false;
+
+            if (isPriceDisplayed.Equals(expectedResult))
+            {
+                break;
+            }
+        }
+        Assert.IsTrue(isPriceDisplayed);
     }
 
     public void ClickOnAddToCart()
@@ -106,18 +132,20 @@ public class HomePage : WebPage, IHomePage
 
     public void IsPayFasterDisplayed()
     {
-        Thread.Sleep(2000);
-
         var cart_page = "//div[@class='wc-proceed-to-checkout']/div";
         var checkout_page = "wc-stripe-payment-request-wrapper";
         bool isDisplayed = false;
         try
         {
-            isDisplayed = Driver.FindElement(By.XPath(cart_page)).Displayed;
+            locator = By.XPath(cart_page);
+            WaitUntilElementIsVisible(locator);
+            isDisplayed = Driver.FindElement(locator).Displayed;
         }
         catch
         {
-            isDisplayed = Driver.FindElement(By.Id(checkout_page)).Displayed;
+            locator = By.Id(checkout_page);
+            WaitUntilElementIsVisible(locator);
+            isDisplayed = Driver.FindElement(locator).Displayed;
         }
 
         Assert.IsTrue(isDisplayed);
@@ -125,14 +153,13 @@ public class HomePage : WebPage, IHomePage
 
     public void ClickOnProceedToCheckout()
     {
+        WaitToLoadPage();
         ClickElement(checkOutButton);
     }
 
     public void FillBillingDetails(Table table)
     {
-        var dictionary = GetDataTable(table);
-
-        foreach (KeyValuePair<string, string> billing_form in dictionary)
+        foreach (KeyValuePair<string, string> billing_form in TableToDictionary(table))
         {
             FillBillingDetailsById(billing_form);
         }
@@ -142,7 +169,21 @@ public class HomePage : WebPage, IHomePage
     {
         try
         {
-            Driver.FindElement(By.Id(billing_form.Key)).SendKeys(billing_form.Value);
+            if (billing_form.Value.Contains("generate", StringComparison.OrdinalIgnoreCase))
+            {
+                //Generate Email Random
+                var newEntry = new KeyValuePair<string, string>(billing_form.Key, Faker.Internet.FreeEmail().ToString());
+                element = Driver.FindElement(By.Id(newEntry.Key));
+                element.Clear();
+                element.SendKeys(newEntry.Value);
+                return;
+            }
+            else
+            { 
+                element = Driver.FindElement(By.Id(billing_form.Key));
+                element.Clear();
+                element.SendKeys(billing_form.Value);
+            }
         }
         catch
         {
@@ -155,8 +196,9 @@ public class HomePage : WebPage, IHomePage
                     {
                         Action().MoveToElement(element).Click().SendKeys(billing_form.Value).SendKeys(Keys.Down).SendKeys(Keys.Enter).Build().Perform();
                     }
-                    else { 
-                        Action().MoveToElement(element).Click().SendKeys(billing_form.Value).SendKeys(Keys.Enter).Build().Perform(); 
+                    else
+                    {
+                        Action().MoveToElement(element).Click().SendKeys(billing_form.Value).SendKeys(Keys.Enter).Build().Perform();
                     }
                 }
                 else
@@ -168,17 +210,41 @@ public class HomePage : WebPage, IHomePage
             {
                 try
                 {
-                    element = Driver.FindElement(By.Id("payment"));
-                    Action().MoveToElement(element).Click().SendKeys(billing_form.Value).SendKeys(Keys.Enter).Build().Perform();
-                  
+                    Driver.SwitchTo().Frame(Driver.FindElement(By.XPath("//*[@id='wc-stripe-upe-element']/div/iframe")));
+                    element = Driver.FindElement(By.Id(billing_form.Key));
+                    element.Clear();
+                    element.SendKeys(billing_form.Value);
 
-                    string test = null;
+                    Driver.SwitchTo().DefaultContent();
                 }
-                catch
+                catch(Exception ex)
                 {
-
+                    Assert.Fail(string.Format("Error to enter values: {0}", ex.Message));
                 }
             }
         }
+    }
+
+    public void AcceptTermsAndConditions()
+    {
+        ClickElement(checkOutTermsButton);
+    }
+
+    public void AcceptTestingConsent()
+    {
+        ClickElement(checkOutTestingConsentButton);
+    }
+
+    public void PlaceOrder()
+    {
+        ClickElement(placeOrderButton);
+    }
+
+    public void IsOrderNumberDisplayed()
+    {
+        WaitToLoadPage();
+        locator = By.XPath("//li[contains(., 'Order number')]");
+        WaitUntilElementIsVisible(locator);
+        Assert.IsTrue(Driver.FindElement(locator).Displayed);
     }
 }
