@@ -159,7 +159,7 @@ public class HomePage : WebPage, IHomePage
 
     public void FillBillingDetails(Table table)
     {
-        foreach (KeyValuePair<string, string> billing_form in TableToDictionary(table))
+        foreach (KeyValuePair<string, string> billing_form in Utils.TableToDictionary(table))
         {
             FillBillingDetailsById(billing_form);
         }

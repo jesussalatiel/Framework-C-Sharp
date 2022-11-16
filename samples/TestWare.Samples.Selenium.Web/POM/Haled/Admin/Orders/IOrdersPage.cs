@@ -1,4 +1,5 @@
 ﻿
+using System.Threading;
 using TestWare.Core.Interfaces;
 
 namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Orders;
@@ -6,5 +7,17 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Orders;
 public interface IOrdersPage : ITestWareComponent
 {
 
-    void SelectOrderByDate(string ordered_by, string status, string date);
+    void SelectOrderByDate(Table table);
+
+    void ClickOnGenerateCode();
+
+    void EnterFedexShipping(string code);
+
+    void ClickOnAssignTrackingCode();
+
+    void SelectShippingCarrier(string carrier);
+
+    void ClickOnSaveShippingInfo();
+
+    void EnterTrackingNumber(string tracking);
 }

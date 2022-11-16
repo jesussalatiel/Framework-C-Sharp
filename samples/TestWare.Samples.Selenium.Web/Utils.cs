@@ -5,12 +5,16 @@ namespace TestWare.Samples.Selenium.Web;
 public class Utils
 {
 
-    
-    public static string GenerateEmail()
+
+    public static Dictionary<string, string> TableToDictionary(Table table)
     {
-        return Faker.Internet.FreeEmail().ToString();
+        var dictionary = new Dictionary<string, string>();
+        foreach (var row in table.Rows)
+        {
+            dictionary.Add(row[0], row[1]);
+        }
+        return dictionary;
     }
 
-   
 }
 

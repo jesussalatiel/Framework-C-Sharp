@@ -169,16 +169,6 @@ public abstract class PageBase
         WaitToLoadPage(TimeToWait).Until(x=> Driver.FindElement(locator));
     }
 
-    protected Dictionary<string, string> TableToDictionary(Table table)
-    {
-        var dictionary = new Dictionary<string, string>();
-        foreach (var row in table.Rows)
-        {
-            dictionary.Add(row[0], row[1]);
-        }
-        return dictionary;
-    }
-
     protected void WaitToLoadPage()
     {
         new WebDriverWait(Driver, TimeSpan.FromSeconds(30)).Until(
