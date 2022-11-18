@@ -34,45 +34,69 @@ Scenario Outline: Generate an order
 #	Then the user verifies the order number
 #	And the user should confirm the "<price>" displayed
 #
-#	#Generate Tracking Code
-#	Then the admin enters default username
-#	And the admin enters default password 
-#	When the admin clicks login
-#	Then the admin clicks on "Orders"
-#	And the admin selects the order
-#	| key       | value         |
-#	| name      | Jesus         |
-#	| last name | Test          |
-#	| status    | Order Placed  |
-#	Then the admin clicks on generate code
-#	And the admin enters fedex shipping "<tracking_code>"
-#	When the admin click on assign tracking code
-#	And the admin selects shipping "<carrier>" 
-#	And the admin enters tracking "<tracking_code>"
-#	When the admin clicks on save shipping info
+##	#Generate Tracking Code - Order Placed - Pending Delivery
+	Then the admin enters default username
+	And the admin enters default password 
+	When the admin clicks login
+	Then the admin clicks on "Orders"
+	And the admin selects the order
+	| key       | value         |
+	| name      | Jesus         |
+	| last name | Test          |
+	| status    | Delivered  |
+	#Then the admin clicks on generate code
+	#And the admin enters fedex shipping "<tracking_code>"
+	#When the admin click on assign tracking code
+	#And the admin selects shipping "<carrier>" 
+	#And the admin enters tracking "<tracking_code>"
+	#When the admin clicks on save shipping info
 
 	#Assing user password (workaround: I dont' have access to see the temporal password)
 	Then the admin saves consumer tracking code
-	Then the admin click on "Consumer" icon
-	#And the admin registers personal email and go to "Consumer" and search by email
-	#When the admin clicks search
-	#Then the admin verifies that the email address corresponds
-	#And the admin clicks on edit
-	#And the admin modifies new password fields
-	#| password        | confirm password |
-	#| NoExcuses@12345 | NoExcuses@12345  |
-	#And the admin saves email and password
-	#When the admin clicks on save changes
-	#Then the admin verifies popup ""
+	Then the admin clicks on "Consumer" icon
+	And the admin saves the email
+	When the admin clicks on close
+	Then the admin clicks on "Consumers"
+	And the admin searches by saved email
+    When the admin clicks search
+	And the admin clicks on edit
+	And the admin modifies new password fields
+	| key        | value |
+	| password | NoExcuses@12345  |
+	| password_confirmation | NoExcuses@12345  |
+	And the admin saves email and password
+	When the admin clicks on save changes
+	Then the admin verifies popup "Consumer updated successfully."
 
 
 	#User: 
+	Then the user log into the system
+	#And the user clicks on ""
 	#Then the user enters tracking code assign by admin
 	#And the user selects I am the test taker 18 years and over
 	#And the user clicks on register kit
 	#Then the user enters credentials given by admin
 	#When the user clicks on Login
-	#Then the user fill the form
+	#Then the user fills the testing consent
+	#| key        | value |
+	#| first_name |       |
+	#| last_name  |       |
+	#And the user accepts consent form
+	#And the user clicks on agree and submit
+	#Then the user verifies the message "Testing Consent Stored!"
+	#When the user clicks on complete registration
+	#Then the user verifies message "Test kit registered successfully."
+
+	#Then the admin enters default username
+	#And the admin enters default password 
+	#When the admin clicks login
+	#Then the admin clicks on "Orders"
+	#And the admin selects the order
+	#| key       | value         |
+	#| name      | Jesus         |
+	#| last name | Test          |
+	#| status    | Delivered     |
+
 
 
 	Examples: 

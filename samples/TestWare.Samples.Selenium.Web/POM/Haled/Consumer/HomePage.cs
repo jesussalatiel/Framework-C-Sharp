@@ -1,10 +1,7 @@
-﻿
-using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
+﻿using OpenQA.Selenium;
 using TestWare.Engines.Selenium.Extras;
 using TestWare.Engines.Selenium.Factory;
 using TestWare.Engines.Selenium.Pages;
-using static MongoDB.Driver.WriteConcern;
 
 namespace TestWare.Samples.Selenium.Web.POM.Haled.Consumer;
 

@@ -1,19 +1,57 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Interactions;
 using OpenQA.Selenium.Support.Extensions;
-using System.Threading;
 using TestWare.Engines.Selenium.Extras;
 using TestWare.Engines.Selenium.Factory;
 using TestWare.Engines.Selenium.Pages;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Orders
 {
     public class OrdersPage : WebPage, IOrdersPage
     {
+        [FindsBy(How = How.XPath, Using = "//button[contains(., 'Close')]")]
+        public IWebElement CloseButton { get; set; }
+
+
         private By locator;
         private IWebElement element;
-        public OrdersPage(IBrowserDriver driver) : base(driver)
+
+        public OrdersPage(IBrowserDriver driver) : base(driver) { }
+
+       
+        public string GetTrackingCode()
         {
+            locator = By.XPath("//h5[contains(text(), 'Kit ID')]");
+            WaitUntilElementIsVisible(locator);
+            IList<IWebElement> span = Driver.FindElement(locator).FindElements(By.TagName("span"));
+            string tmp="";
+            foreach (var text in span)
+            {
+               tmp += (!text.Text.Equals("")) ? string.Format("{0}-", text.Text): null;
+            }
+            return tmp.Remove(tmp.Length-1);
+        }
+
+
+        public void ClickOnUserIcon(string icon)
+        {
+            locator = By.XPath(string.Format("//div[contains(text(), '{0}')]/following-sibling::div", icon));
+            WaitUntilElementIsVisible(locator);
+            Driver.ExecuteJavaScript("arguments[0].scrollIntoView(true);", Driver.FindElement(locator));
+            ClickElement(Driver.FindElement(locator));
+        }
+
+        public string GetUserEmail()
+        {
+            locator = By.XPath("//div[contains(text(), 'Email Address')]/parent::div/div[2]");
+            WaitUntilElementIsVisible(locator);
+            return Driver.FindElement(locator).Text;
+        }
+
+        public void ClickOnClose()
+        {
+            WaitToElementLoad(CloseButton);
+            ClickElement(CloseButton);
         }
         public void ClickOnSaveShippingInfo()
         {
@@ -40,7 +78,8 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Orders
             if (carrier.Equals("Fedex", StringComparison.CurrentCultureIgnoreCase))
             {
                 Action().Pause(TimeSpan.FromSeconds(3)).MoveToElement(element).Click().SendKeys(Keys.Down).SendKeys(Keys.Enter).Build().Perform();
-            }else if (carrier.Equals("UPS", StringComparison.CurrentCultureIgnoreCase))
+            }
+            else if (carrier.Equals("UPS", StringComparison.CurrentCultureIgnoreCase))
             {
                 Action().Pause(TimeSpan.FromSeconds(3)).MoveToElement(element).Click().SendKeys(Keys.Down).SendKeys(Keys.Down).SendKeys(Keys.Enter).Build().Perform();
             }
@@ -126,5 +165,7 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Orders
             }
             Assert.IsTrue(wasSuccessful, "Order not found");
         }
+
+
     }
 }

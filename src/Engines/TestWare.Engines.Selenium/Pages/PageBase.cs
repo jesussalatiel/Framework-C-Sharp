@@ -122,6 +122,8 @@ public abstract class PageBase
 
         fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
 
+        fluentWait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
+
         fluentWait.Message = "Element to be searched not found";
 
         fluentWait.Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(locator));
@@ -161,12 +163,12 @@ public abstract class PageBase
 
     protected void WaitToElementLoad(IWebElement element)
     {
-        WaitToLoadPage(TimeToWait).Until(x => element);
+        WaitToLoadPage(TimeToWait).Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(By.TagName("body")));
     }
 
     protected void WaitToElementLoad(By locator)
     {
-        WaitToLoadPage(TimeToWait).Until(x=> Driver.FindElement(locator));
+        WaitToLoadPage(TimeToWait).Until(ExpectedConditions.VisibilityOfAllElementsLocatedBy(locator));
     }
 
     protected void WaitToLoadPage()

@@ -1,9 +1,11 @@
-﻿using TestWare.Samples.Selenium.Web.StepDefinitions;
+﻿using System.Collections;
 
 namespace TestWare.Samples.Selenium.Web;
 
 public class Utils
 {
+
+    private static ArrayList backup = new ArrayList();
 
 
     public static Dictionary<string, string> TableToDictionary(Table table)
@@ -16,5 +18,14 @@ public class Utils
         return dictionary;
     }
 
+    public static void SaveData(string data)
+    {
+        backup.Add(data);
+    }
+
+    public static ArrayList GetData()
+    {
+        return backup;
+    }
 }
 

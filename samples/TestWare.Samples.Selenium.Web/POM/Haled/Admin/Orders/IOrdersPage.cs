@@ -20,4 +20,12 @@ public interface IOrdersPage : ITestWareComponent
     void ClickOnSaveShippingInfo();
 
     void EnterTrackingNumber(string tracking);
+
+    void ClickOnUserIcon(string icon);
+
+    void ClickOnClose();
+
+    string GetTrackingCode();
+
+    string GetUserEmail();
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System.Drawing;
+using System.Threading;
 using TestWare.Core;
 using TestWare.Samples.Selenium.Web.POM.Haled.Admin.Orders;
 
@@ -59,13 +60,25 @@ public class OrdersSteps
     [Then(@"the admin saves consumer tracking code")]
     public void ThenTheAdminSavesConsumerTrackingCode()
     {
-
+        Utils.SaveData(ordersPage.GetTrackingCode());
     }
 
-    [Then(@"the admin click on ""(.*)"" icon")]
-    public void ThenTheAdminClickOnIcon(string consumer0)
+    [Then(@"the admin clicks on ""(.*)"" icon")]
+    public void ThenTheAdminClicksOnIcon(string icon)
     {
+        ordersPage.ClickOnUserIcon(icon);
+    }
 
+    [When(@"the admin clicks on close")]
+    public void WhenTheAdminClicksOnClose()
+    {
+        ordersPage.ClickOnClose();
+    }
+
+    [Then(@"the admin saves the email")]
+    public void ThenTheAdminSavesTheEmail()
+    {
+        Utils.SaveData(ordersPage.GetUserEmail());
     }
 }
 
