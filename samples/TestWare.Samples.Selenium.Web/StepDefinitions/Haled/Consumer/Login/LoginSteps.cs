@@ -13,37 +13,10 @@ public class LoginSteps
         loginPage = ContainerManager.GetTestWareComponent<ILoginPage>();
     }
 
-    [When(@"the user clicks on Login")]
-    public void WhenTheUserClicksOnLogin()
-    {
-
-    }
-
-    [Then(@"the user enters tracking code assign by admin")]
-    public void ThenTheUserEntersTrackingCodeAssignByAdmin()
-    {
-    }
-
-    [Then(@"the user selects I am the test taker (.*) years and over")]
-    public void ThenTheUserSelectsIAmTheTestTakerYearsAndOver(int p0)
-    {
-
-    }
-
-    [Then(@"the user clicks on register kit")]
-    public void ThenTheUserClicksOnRegisterKit()
-    {
-
-    }
-
-    [Then(@"the user enters credentials given by admin")]
-    public void ThenTheUserEntersCredentialsGivenByAdmin()
-    {
-    }
-
     [Then(@"the user fills the testing consent")]
     public void ThenTheUserFillsTheTestingConsent(Table table)
     {
+        loginPage.RegisterTestKit(table);
     }
 
     [Then(@"the user accepts consent form")]
@@ -59,13 +32,14 @@ public class LoginSteps
     [Then(@"the user log into the system")]
     public void ThenTheUserLogIntoTheSystem()
     {
-        loginPage.Login(Utils.GetData()[1].ToString(), Utils.GetData()[2].ToString());
+        //Utils.GetData()[2].ToString()
+        loginPage.Login("helene@yahoo.com", "Juegos1224@");
     }
 
-    [Then(@"the user clicks on ""(.*)""")]
-    public void ThenTheUserClicksOn(string p0)
+    [Then(@"the user clicks on profile button")]
+    public void ThenTheUserClicksOnProfileButton()
     {
-
+        loginPage.ClickOnProfile();
     }
 }
 

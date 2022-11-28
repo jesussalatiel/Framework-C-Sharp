@@ -64,6 +64,13 @@ public abstract class PageBase
     protected void SendKeysElement(IWebElement element, string text)
         => this.SendKeysElement(element, text, TimeToWait);
 
+    protected void SendKeysElement(By locator, string text) {
+        IWebElement element = Driver.FindElement(locator);
+        element = element ?? throw new ArgumentNullException(nameof(element), "Element to send keys was null");
+        element.Clear();
+        element.SendKeys(text);
+    }
+
     protected void SendKeysElement(IWebElement element, string text, int timeToWait)
     {
         element = element ?? throw new ArgumentNullException(nameof(element), "Element to send keys was null");
