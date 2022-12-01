@@ -1,5 +1,6 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.Extensions;
+using OpenQA.Selenium.Support.UI;
 using TestWare.Engines.Selenium.Extras;
 using TestWare.Engines.Selenium.Factory;
 using TestWare.Engines.Selenium.Pages;
@@ -29,12 +30,9 @@ public class LoginPage : WebPage, ILoginPage
 
     public void RegisterTestKit(Table table)
     {
-        locator = By.XPath("//button[contains(., 'Register Test Kit')]");
-        WaitUntilElementIsVisible(locator);
-        ClickElement(Driver.FindElement(locator));
         locator = By.XPath("//form[contains(., 'Register your test kit using Unique Kit ID.')]");
         WaitUntilElementIsVisible(locator);
-        SendKeysElement(Driver.FindElement(By.Name("kit_id")), "HL01-002-E4OKGR");
+        SendKeysElement(Driver.FindElement(By.Name("kit_id")), Utils.GetData()[0].ToString());
 
         foreach (var data in Utils.TableToDictionary(table))
         {
@@ -45,8 +43,8 @@ public class LoginPage : WebPage, ILoginPage
                 locator = By.XPath("//button[contains(., 'Register Kit')]");
                 WaitUntilElementIsClickable(Driver.FindElement(locator));
                 ClickElement(Driver.FindElement(locator));
-                WaitToLoadPage();
 
+                WaitUntilElementIsVisible(By.XPath("//div[@class='legal-guardian__scroll']"));
                 element = Driver.FindElement(By.Name("first_name"));
                 Driver.ExecuteJavaScript("arguments[0].scrollIntoView(true);", element);
 
@@ -61,47 +59,154 @@ public class LoginPage : WebPage, ILoginPage
                     ClickElement(Driver.FindElement(locator));
                     WaitToLoadPage();
                 }
-                else
-                {
-                    SendKeysElement(element, "Jesus");
-                    SendKeysElement(By.Name("last_name"), "Salatiel");
-                    SendKeysElement(By.Name("legal_guardian_first_name"), "Salatiel");
-                    SendKeysElement(By.Name("legal_guardian_last_name"), "Salatiel"); 
-                    SendKeysElement(By.Name("legal_guardian_phone_number"), "7212318271");
-                    locator = By.XPath("//label[@for='legal_guardian_agreement']");
-                    WaitUntilElementIsVisible(locator);
-                    ClickElement(Driver.FindElement(locator));
-                    locator = By.XPath("//label[@for='consent_agreement']");
-                    ClickElement(Driver.FindElement(locator));
-                    WaitToLoadPage();
-
-                    //Missing Click
-                    locator = By.Name("legal_guardian_date_of_birthDateDisplay");
-                    ClickElement(Driver.FindElement(locator));
-
-                    DataPickerDateOfBirth(By.XPath("//div[@class='rdrCalendarWrapper']"));
-                }
             }
         }
     }
 
-    public void DataPickerDateOfBirth(By locator)
+    public void ClickOnCompleteRegistration()
     {
-       foreach(var elements in Driver.FindElements(locator)) {
-
-            var elemnt = elements.Text;
-
-
-       } 
+        WaitToLoadPage();
+        locator = By.XPath("//button[contains(., 'Complete Registration')]");
+        WaitUntilElementIsVisible(locator);
+        ClickElement(Driver.FindElement(locator));
     }
 
-    public void ClickOnProfile()
+    public void SelectKitWithPendingSchedulle(string test_kit)
+    {
+        ScrollByCoordinates(0, 400);
+        locator = By.XPath("(//table)[1]/tbody");
+        WaitUntilElementIsVisible(locator);
+        foreach (var elements in Driver.FindElements(locator))
+        {
+            foreach (var element in Driver.FindElements(By.TagName("td")))
+            {
+                if (element.Text.Equals(test_kit))
+                {
+                    locator = By.XPath("//button[contains(., 'Schedule')]");
+                    WaitUntilElementIsClickable(Driver.FindElement(locator));
+                    ClickElement(Driver.FindElement(locator));
+                    break;
+                }
+                else
+                {
+                    Assert.AreSame(test_kit, element.Text, "Test kit does not exists");
+                }
+            }
+        }
+
+        locator = By.Name("time_id0");
+        WaitUntilElementIsVisible(locator);
+        var appointmentTime = new SelectElement(Driver.FindElement(locator));
+        appointmentTime.SelectByValue(new Random().Next(1, 11).ToString());
+
+        locator = By.Name("timezone_id");
+        WaitUntilElementIsVisible(locator);
+        var timezone = new SelectElement(Driver.FindElement(locator));
+        timezone.SelectByValue(new Random().Next(1, 13).ToString());
+
+        locator = By.Name("schedule_note");
+        WaitUntilElementIsVisible(locator);
+        SendKeysElement(Driver.FindElement(locator), Faker.Lorem.Sentence());
+
+        ClickElement(Driver.FindElement(By.Name("schedule_date0DateDisplay")));
+        if (SelectDateOfCalendar(By.XPath("//div[@class='rdrCalendarWrapper']"), null))
+        {
+            element = Driver.FindElement(By.XPath("(//button[contains(., 'Submit')])[2]"));
+            ScrollByElement(element);
+            ClickElement(element);
+            WaitToLoadPage();
+
+            while (IsDisplayedByLocator(By.Name("schedule_date0DateDisplay")))
+            {
+                Driver.FindElement(By.Name("schedule_date0DateDisplay")).Click();
+                SelectDateOfCalendar(By.XPath("//div[@class='rdrCalendarWrapper']"), Driver.FindElement(By.Name("schedule_date0DateDisplay")).GetAttribute("value"));
+                Driver.FindElement(By.XPath("(//button[contains(., 'Submit')])[2]")).Click();
+                Thread.Sleep(5000);
+            }
+            WaitUntilElementIsVisible(By.XPath("//p[contains(., 'Scheduled Request')]"));
+            Assert.IsTrue(Driver.FindElement(By.XPath("//p[contains(., 'Scheduled Request')]")).Displayed);
+        }
+    }
+
+    public bool SelectDateOfCalendar(By locator, string date = null)
+    {
+        var hs = date;
+
+        bool isDate = false;
+        IList<IWebElement> elements = Driver.FindElement(locator).FindElements(By.TagName("div"));
+        for (var i = 0; i < elements.Count; i++)
+        {
+            try
+            {
+                if (elements[i].GetAttribute("class").Equals("rdrMonths rdrMonthsVertical"))
+                {
+                    foreach (var types in elements[i].FindElements(By.TagName("div")))
+                    {
+                        if (types.GetAttribute("class").Equals("rdrDays"))
+                        {
+                            //Get days
+                            IList<IWebElement> days = types.FindElements(By.TagName("button"));
+
+                            for (int j = 0; j < days.Count; j++)
+                            {
+                                if (!days[j].GetAttribute("class").Contains("rdrDayDisabled"))
+                                {
+                                    if (date != null)
+                                    {
+                                        int getActualDay = int.Parse(date.Split("-")[2]);
+
+                                        if (days[j].Text.Equals(getActualDay.ToString()))
+                                        {
+                                            days[j + 1].Click();
+                                            isDate = true;
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        days[j].Click();
+                                        isDate = true;
+                                        break;
+                                    }
+                                }
+
+                                if (j >= (days.Count - 1))
+                                {
+                                    locator = By.XPath("//button[@class='rdrNextPrevButton rdrNextButton']");
+                                    ClickElement(Driver.FindElement(locator));
+                                    days = types.FindElements(By.TagName("button"));
+                                    j = 0;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch 
+            {
+            }
+        }
+        return isDate;
+    }
+
+    public void SelectElementFromProfile(string section)
     {
         locator = By.XPath("//button[@aria-label='user-name']");
         WaitUntilElementIsVisible(locator);
         ClickElement(Driver.FindElement(locator));
-        locator = By.XPath("(//div[@role='menu'])[2]");
+
+        switch (section)
+        {
+            case "Register Test Kit":
+                locator = By.XPath("(//div[@role='menu'])[2]/child::div[2]/div[2]");
+                break;
+
+            case "My Health Tests":
+                locator = By.XPath("(//div[@role='menu'])[2]/child::div[2]/div[1]");
+                break;
+        }
         WaitUntilElementIsVisible(locator);
+        ClickElement(Driver.FindElement(locator));
     }
 
     public void Login(string username, string password)
@@ -120,4 +225,3 @@ public class LoginPage : WebPage, ILoginPage
         WaitToLoadPage();
     }
 }
-

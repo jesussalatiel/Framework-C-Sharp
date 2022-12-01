@@ -50,7 +50,8 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Consumers
         {
             locator = By.Id("search");
             WaitUntilElementIsVisible(locator);
-            Driver.ExecuteJavaScript("window.scrollBy(0,-5000)", "");
+            ScrollByLocator(locator);
+            WaitToLoadPage();
             Action().MoveToElement(Driver.FindElement(locator)).Click().SendKeys(data).SendKeys(Keys.Enter).Pause(TimeSpan.FromSeconds(2)).Build().Perform();
             WaitToLoadPage();
         }

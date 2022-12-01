@@ -1,6 +1,7 @@
 ﻿using AngleSharp.Dom;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Interactions;
+using OpenQA.Selenium.Support.Extensions;
 using OpenQA.Selenium.Support.UI;
 using System.Threading;
 using TechTalk.SpecFlow;
@@ -64,7 +65,8 @@ public abstract class PageBase
     protected void SendKeysElement(IWebElement element, string text)
         => this.SendKeysElement(element, text, TimeToWait);
 
-    protected void SendKeysElement(By locator, string text) {
+    protected void SendKeysElement(By locator, string text)
+    {
         IWebElement element = Driver.FindElement(locator);
         element = element ?? throw new ArgumentNullException(nameof(element), "Element to send keys was null");
         element.Clear();
@@ -159,7 +161,7 @@ public abstract class PageBase
         /* Setting the timeout in seconds */
         fluentWait.Timeout = TimeSpan.FromSeconds(timeToWait);
         /* Configuring the polling frequency in ms */
-        fluentWait.PollingInterval= TimeSpan.FromSeconds(3);
+        fluentWait.PollingInterval = TimeSpan.FromSeconds(3);
 
         fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
 
@@ -182,5 +184,46 @@ public abstract class PageBase
     {
         new WebDriverWait(Driver, TimeSpan.FromSeconds(30)).Until(
         d => ((IJavaScriptExecutor)d).ExecuteScript("return document.readyState").Equals("complete"));
+    }
+
+    protected void ScrollByElement(IWebElement element)
+    {
+        Driver.ExecuteJavaScript("arguments[0].scrollIntoView(true);", element);
+    }
+
+    protected void ScrollByLocator(By locator)
+    {
+        IWebElement element = Driver.FindElement(locator);
+        Driver.ExecuteJavaScript("arguments[0].scrollIntoView(true);", element);
+    }
+
+    protected void ScrollByCoordinates(int x, int y)
+    {
+        Driver.ExecuteJavaScript(string.Format("window.scrollBy({0},{1})", x, y), "");
+    }
+
+    protected bool IsDisplayedByElement(IWebElement element)
+    {
+        try
+        {
+            return element.Displayed;
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
+    }
+
+    protected bool IsDisplayedByLocator(By locator)
+    {
+        try
+        {
+            return Driver.FindElement(locator).Displayed;
+
+        }
+        catch (NoSuchElementException e)
+        {
+            return false;
+        }
     }
 }

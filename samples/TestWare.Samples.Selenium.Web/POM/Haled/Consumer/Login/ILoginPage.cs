@@ -1,4 +1,5 @@
-﻿using TestWare.Core.Interfaces;
+﻿using AventStack.ExtentReports.Model;
+using TestWare.Core.Interfaces;
 
 namespace TestWare.Samples.Selenium.Web.POM.Haled.Consumer.Login
 {
@@ -6,8 +7,12 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Consumer.Login
     {
         void Login(string username, string password);
 
-        void ClickOnProfile();
+        void SelectElementFromProfile(string section);
 
         void RegisterTestKit(Table table);
+
+        void ClickOnCompleteRegistration();
+
+        void SelectKitWithPendingSchedulle(string test_kit);
     }
 }

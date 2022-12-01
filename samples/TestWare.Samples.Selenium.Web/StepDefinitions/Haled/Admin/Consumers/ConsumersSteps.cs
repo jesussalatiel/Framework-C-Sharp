@@ -16,7 +16,8 @@ public class ConsumersSteps
     [Then(@"the admin searches by saved email")]
     public void ThenTheAdminSearchesBySavedEmail()
     {
-        consumerPage.SearchBy("email", Utils.GetData()[1].ToString());
+
+        consumerPage.SearchBy("email", "reina@yahoo.com");
     }
 
     [When(@"the admin clicks search")]

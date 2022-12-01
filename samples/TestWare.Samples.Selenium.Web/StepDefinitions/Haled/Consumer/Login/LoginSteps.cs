@@ -22,24 +22,40 @@ public class LoginSteps
     [Then(@"the user accepts consent form")]
     public void ThenTheUserAcceptsConsentForm()
     {
-    }
-
-    [Then(@"the user clicks on agree and submit")]
-    public void ThenTheUserClicksOnAgreeAndSubmit()
-    {
+        loginPage.ClickOnCompleteRegistration();
     }
 
     [Then(@"the user log into the system")]
     public void ThenTheUserLogIntoTheSystem()
     {
-        //Utils.GetData()[2].ToString()
-        loginPage.Login("helene@yahoo.com", "Juegos1224@");
+        //Utils.GetData()[1].ToString()
+        loginPage.Login("vilma@hotmail.com", "NoExcuses@12345");
     }
 
-    [Then(@"the user clicks on profile button")]
-    public void ThenTheUserClicksOnProfileButton()
+    [Then(@"the user clicks on register test kit")]
+    public void ThenTheUserClicksOnRegisterTestKit()
     {
-        loginPage.ClickOnProfile();
+        loginPage.SelectElementFromProfile("Register Test Kit");
     }
+
+    [Then(@"the user clicks on my health tests")]
+    public void ThenTheUserClicksOnMyHealthTests()
+    {
+        loginPage.SelectElementFromProfile("My Health Tests");
+    }
+
+    [Then(@"the user searches test kit id")]
+    public void ThenTheUserSearchesTestKitId()
+    {
+        //test id
+        loginPage.SelectKitWithPendingSchedulle("HL01-002-PRNO34");
+    }
+
+    [Then(@"the user sets schedule")]
+    public void ThenTheUserSetsSchedule(Table table)
+    {
+
+    }
+
 }
 
