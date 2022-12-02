@@ -13,14 +13,15 @@ public class LoginSteps
         loginPage = ContainerManager.GetTestWareComponent<ILoginPage>();
     }
 
-    [Then(@"the user fills the testing consent")]
-    public void ThenTheUserFillsTheTestingConsent(Table table)
+
+    [Then(@"the user accepts terms of service and privacy policy")]
+    public void ThenTheUserAcceptsTermsOfServiceAndPrivacyPolicy()
     {
-        loginPage.RegisterTestKit(table);
+        loginPage.AcceptsTermsOfServiceAndPrivacyPolicy(Utils.GetData()[0].ToString());
     }
 
-    [Then(@"the user accepts consent form")]
-    public void ThenTheUserAcceptsConsentForm()
+    [Then(@"the user click on complete registration")]
+    public void ThenTheUserClickOnCompleteRegistration()
     {
         loginPage.ClickOnCompleteRegistration();
     }
@@ -28,8 +29,8 @@ public class LoginSteps
     [Then(@"the user log into the system")]
     public void ThenTheUserLogIntoTheSystem()
     {
-        //Utils.GetData()[1].ToString()
-        loginPage.Login("vilma@hotmail.com", "NoExcuses@12345");
+        loginPage.Login(Utils.GetData()[1].ToString(), Utils.GetData()[2].ToString()
+);
     }
 
     [Then(@"the user clicks on register test kit")]
@@ -47,15 +48,7 @@ public class LoginSteps
     [Then(@"the user searches test kit id")]
     public void ThenTheUserSearchesTestKitId()
     {
-        //test id
-        loginPage.SelectKitWithPendingSchedulle("HL01-002-PRNO34");
+        loginPage.SelectKitWithPendingSchedulle(Utils.GetData()[0].ToString());
     }
-
-    [Then(@"the user sets schedule")]
-    public void ThenTheUserSetsSchedule(Table table)
-    {
-
-    }
-
 }
 

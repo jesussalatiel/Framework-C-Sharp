@@ -129,9 +129,9 @@ public abstract class PageBase
         /* Configuring the polling frequency in ms */
         fluentWait.PollingInterval = TimeSpan.FromSeconds(3);
 
-        fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
+        //fluentWait.IgnoreExceptionTypes(typeof(NoSuchElementException));
 
-        fluentWait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
+        //fluentWait.IgnoreExceptionTypes(typeof(WebDriverTimeoutException));
 
         fluentWait.Message = "Element to be searched not found";
 

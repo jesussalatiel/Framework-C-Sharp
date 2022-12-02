@@ -21,7 +21,7 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Consumers
         public void ValidateMessage(string message)
         {
             locator = By.XPath(string.Format("//div[contains(., '{0}')]", message));
-            WaitUntilElementIsVisible(locator);
+            WaitToElementLoad(locator);
             Assert.IsTrue(Driver.FindElement(locator).Displayed);
             WaitToLoadPage();
         }
@@ -29,7 +29,9 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Consumers
         public void ClickOnSaveChanges()
         {
             WaitToElementLoad(saveChangesButton);
+            ScrollByElement(saveChangesButton);
             ClickElement(saveChangesButton);
+            WaitToLoadPage();
         }
         public void ClickOnSearch()
         {
@@ -49,11 +51,19 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Consumers
         public void SearchBy(string category, string data)
         {
             locator = By.Id("search");
-            WaitUntilElementIsVisible(locator);
-            ScrollByLocator(locator);
-            WaitToLoadPage();
-            Action().MoveToElement(Driver.FindElement(locator)).Click().SendKeys(data).SendKeys(Keys.Enter).Pause(TimeSpan.FromSeconds(2)).Build().Perform();
-            WaitToLoadPage();
+            try
+            {
+                WaitUntilElementIsVisible(locator);
+                ScrollByLocator(locator);
+                WaitToLoadPage();
+                Action().MoveToElement(Driver.FindElement(locator)).Click().SendKeys(data).SendKeys(Keys.Enter).Pause(TimeSpan.FromSeconds(2)).Build().Perform();
+                WaitToLoadPage();
+            }
+            catch
+            {
+                ScrollByLocator(locator);
+                Driver.FindElement(locator).SendKeys(data);
+            }
         }
 
         public void ClickOnEditConsumer()
@@ -94,7 +104,8 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Admin.Consumers
             foreach (KeyValuePair<string, string> data in Utils.TableToDictionary(table))
             {
                 By password = By.XPath(string.Format("//input[@name='{0}']", data.Key));
-                SendKeysElement(Driver.FindElement(password), data.Value);
+                Driver.FindElement(password).SendKeys(data.Value);
+                WaitToLoadPage();
             }
         }
     }

@@ -9,7 +9,7 @@ namespace TestWare.Samples.Selenium.Web.POM.Haled.Consumer.Login
 
         void SelectElementFromProfile(string section);
 
-        void RegisterTestKit(Table table);
+        void AcceptsTermsOfServiceAndPrivacyPolicy(string test_kit);
 
         void ClickOnCompleteRegistration();
 

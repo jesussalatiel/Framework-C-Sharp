@@ -28,39 +28,32 @@ public class LoginPage : WebPage, ILoginPage
         NavigateToUrl();
     }
 
-    public void RegisterTestKit(Table table)
+    public void AcceptsTermsOfServiceAndPrivacyPolicy(string test_kit)
     {
         locator = By.XPath("//form[contains(., 'Register your test kit using Unique Kit ID.')]");
         WaitUntilElementIsVisible(locator);
-        SendKeysElement(Driver.FindElement(By.Name("kit_id")), Utils.GetData()[0].ToString());
+        SendKeysElement(Driver.FindElement(By.Name("kit_id")), test_kit);
 
-        foreach (var data in Utils.TableToDictionary(table))
-        {
-            if (data.Key.Contains("legal_age"))
-            {
-                ClickElement(Boolean.Parse(data.Value) ? Driver.FindElement(By.XPath("//input[@id='test-taker']/parent::div")) : Driver.FindElement(By.XPath("//input[@id='not_test_taker']/parent::div")));
-                WaitToLoadPage();
-                locator = By.XPath("//button[contains(., 'Register Kit')]");
-                WaitUntilElementIsClickable(Driver.FindElement(locator));
-                ClickElement(Driver.FindElement(locator));
+        ClickElement(Driver.FindElement(By.XPath("//input[@id='test-taker']/parent::div")));
+        WaitToLoadPage();
+        locator = By.XPath("//button[contains(., 'Register Kit')]");
+        WaitUntilElementIsClickable(Driver.FindElement(locator));
+        ClickElement(Driver.FindElement(locator));
 
-                WaitUntilElementIsVisible(By.XPath("//div[@class='legal-guardian__scroll']"));
-                element = Driver.FindElement(By.Name("first_name"));
-                Driver.ExecuteJavaScript("arguments[0].scrollIntoView(true);", element);
+        WaitUntilElementIsVisible(By.XPath("//div[@class='legal-guardian__scroll']"));
+        element = Driver.FindElement(By.Name("first_name"));
+        Driver.ExecuteJavaScript("arguments[0].scrollIntoView(true);", element);
 
-                if (Boolean.Parse(data.Value))
-                {
-                    SendKeysElement(element, "Jesus");
-                    SendKeysElement(By.Name("last_name"), "Salatiel");
-                    WaitToLoadPage();
-                    ClickElement(Driver.FindElement(By.XPath("//label[@for='consent_agreement']")));
-                    locator = By.XPath("//button[contains(., 'Agree')]");
-                    WaitUntilElementIsClickable(Driver.FindElement(locator));
-                    ClickElement(Driver.FindElement(locator));
-                    WaitToLoadPage();
-                }
-            }
-        }
+
+        SendKeysElement(element, Faker.Name.First());
+        SendKeysElement(By.Name("last_name"), Faker.Name.Last());
+        WaitToLoadPage();
+        ClickElement(Driver.FindElement(By.XPath("//label[@for='consent_agreement']")));
+        locator = By.XPath("//button[contains(., 'Agree')]");
+        WaitUntilElementIsClickable(Driver.FindElement(locator));
+        ClickElement(Driver.FindElement(locator));
+        WaitToLoadPage();
+
     }
 
     public void ClickOnCompleteRegistration()
@@ -182,7 +175,7 @@ public class LoginPage : WebPage, ILoginPage
                     }
                 }
             }
-            catch 
+            catch
             {
             }
         }
